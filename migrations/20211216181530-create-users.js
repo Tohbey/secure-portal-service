@@ -36,6 +36,11 @@ module.exports = {
           notEmpty: {msg: 'email must not be empty'}
         }
       },
+      status:{
+        type: DataTypes.ENUM('active', 'inactive', 'suspended'),
+        allowNull: false,
+        defaultValue: 'inactive'
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

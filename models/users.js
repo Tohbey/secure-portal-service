@@ -46,6 +46,11 @@ module.exports = (sequelize, DataTypes) => {
         notNull: {msg: 'User must have a email'},
         notEmpty: {msg: 'email must not be empty'}
       }
+    },
+    status:{
+      type: DataTypes.ENUM('active', 'inactive', 'suspended'),
+      allowNull: false,
+      defaultValue: 'inactive'
     }
   }, {
     sequelize,
