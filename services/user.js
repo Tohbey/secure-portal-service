@@ -1,4 +1,4 @@
-const { Users, Otp } = require('../models');
+const { Users, Otps } = require('../models');
 const { mailSender, GenerateOTP } = require('../utils/index');
 const { MSG_TYPES } = require('../constant/types');
 const moment = require("moment");
@@ -15,14 +15,18 @@ class UserService {
                     return reject({ statusCode: 404, msg: MSG_TYPES.EXIST })
                 }
 
-                console.log(body)
                 const createUser = await Users.create(body);
                 
                 const token = GenerateOTP(4);
-                expiredDate = moment().add(20, "minutes");
+                const expiredDate = moment().add(20, "minutes");
                 
-                const createOTP = await Otp.create(
-                    {token, userId: createUser.id, expiredAt: expiredDate})
+                const otpObject = {
+                    token: token,
+                    expiresAt: expiredDate,
+                    userId: 4,
+                }
+                console.log(otpObject)
+                const createOTP = await Otps.create(otpObject)
 
                 resolve(createUser, createOTP);
             } catch (error) {
