@@ -16,6 +16,10 @@ module.exports = {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
       },
+      expiresAt:{
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

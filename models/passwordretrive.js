@@ -30,7 +30,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     expiresAt:{
       type: DataTypes.DATE,
-      defaultValue: null,
       allowNull: false,
     }
   }, {

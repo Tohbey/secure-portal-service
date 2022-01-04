@@ -28,15 +28,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
     },
+    userId:{
+      type: DataTypes.INTEGER,
+      defaultValue: null,
+    },
     expiresAt:{
       type: DataTypes.DATE,
-      defaultValue: null,
       allowNull: false,
     }
   }, {
     sequelize,
-    modelName: 'Otp',
-    tableName:'otp'
+    modelName: 'Otps',
+    tableName:'otps'
   });
   return Otp;
 };
