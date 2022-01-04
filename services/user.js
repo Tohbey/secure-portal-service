@@ -1,7 +1,7 @@
-const { Users } = require('../models');
+const { Users, Otp } = require('../models');
+const { mailSender, GenerateOTP } = require('../utils/index');
 const { MSG_TYPES } = require('../constant/types');
-
-
+const moment = require("moment");
 class UserService {
 
     static create(body) {
@@ -9,15 +9,22 @@ class UserService {
             try {
                 const user = await Users.findOne({
                     where: {email: body.email}
-                })
-
+                });
+                
                 if(user){
-                    reject({ statusCode: 404, msg: MSG_TYPES.EXIST })
+                    return reject({ statusCode: 404, msg: MSG_TYPES.EXIST })
                 }
 
+                console.log(body)
                 const createUser = await Users.create(body);
+                
+                const token = GenerateOTP(4);
+                expiredDate = moment().add(20, "minutes");
+                
+                const createOTP = await Otp.create(
+                    {token, userId: createUser.id, expiredAt: expiredDate})
 
-                resolve(createUser)
+                resolve(createUser, createOTP);
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
@@ -42,7 +49,8 @@ class UserService {
         return new Promise(async (resolve, reject) => {
             try {
                 const user = await Users.findOne({
-                    where: filter
+                    where: filter,
+                    include: 'otp'
                 });
 
                 if(!user){

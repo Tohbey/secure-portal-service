@@ -9,8 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
-      // define association here
+    static associate({Otp, PasswordRetrive}) {
+     // define association here 
+     this.hasOne(Otp, {foreignKey: 'userId', as:'otp'});
+     this.hasOne(PasswordRetrive, {foreignKey: 'userId', as: 'passwordRetrive'})    
     }
 
     toJSON(){
@@ -37,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     isVerified: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      defaultValue: false
     },
     email:{
       type: DataTypes.STRING,
@@ -49,7 +51,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     status:{
       type: DataTypes.ENUM('active', 'inactive', 'suspended'),
-      allowNull: false,
       defaultValue: 'inactive'
     }
   }, {

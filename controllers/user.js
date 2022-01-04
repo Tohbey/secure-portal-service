@@ -2,6 +2,7 @@ const UserService = require('../services/user');
 const { MSG_TYPES } = require('../constant/types');
 const { JsonResponse } = require('../lib/apiResponse');
 const { validateUser } = require('../request/user');
+const bcrypt = require('bcrypt');
 
 
 exports.create = async (req, res, next) => {
@@ -9,9 +10,12 @@ exports.create = async (req, res, next) => {
         const {error} = validateUser(req.body);
         if (error) return JsonResponse(res, 400, error.details[0].message)
 
-        const createUser = await UserService.create(req.body);
+        const salt = await bcrypt.genSalt(10);
+        req.body.password = await bcrypt.hash(req.body.password, salt);
 
-        JsonResponse(res, 201, MSG_TYPES.CREATED, createUser)
+        const {createUser, createOTP} = await UserService.create(req.body);
+
+        JsonResponse(res, 201, MSG_TYPES.CREATED, createUser, createOTP)
     } catch (error) {
         console.log({error})
         next(error)
