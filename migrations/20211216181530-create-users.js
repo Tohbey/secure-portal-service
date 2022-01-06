@@ -41,6 +41,10 @@ module.exports = {
         allowNull: false,
         defaultValue: 'inactive'
       },
+      questionId:{
+        type: DataTypes.INTEGER,
+        defaultValue: null,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE
