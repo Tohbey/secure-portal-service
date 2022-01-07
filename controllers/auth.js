@@ -10,10 +10,11 @@ exports.login = async (req, res, next) => {
         const { error } = validateLogin(req.body)
         if (error) return JsonResponse(res, 400, error.details[0].message);
 
-        let { user } = await AuthService.login(req.body)
+        let { user, token } = await AuthService.login(req.body)
         // res.header('x-auth-token', token)
-        JsonResponse(res, 200, MSG_TYPES.LOGGED_IN, user)
+        JsonResponse(res, 200, MSG_TYPES.LOGGED_IN, user, token)
     } catch (error) {
+        console.log({error})
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
     }

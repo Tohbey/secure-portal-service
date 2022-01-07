@@ -24,7 +24,8 @@ class AuthService {
                     return reject({ statusCode: 404, msg: MSG_TYPES.INVALID_PASSWORD })
                 }
 
-                resolve({ user })
+                const token = user.generateAuthToken()
+                resolve({ user, token })
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
@@ -36,7 +37,7 @@ class AuthService {
             try {
                 const currentUser = await Users.findOne({
                     where: {
-                        id: user.id,
+                        uuid: user.uuid,
                         status: 'active'
                     }
                 })

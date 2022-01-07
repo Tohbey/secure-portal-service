@@ -2,7 +2,7 @@ const router = require("express").Router();
 const controllers = require("../controllers");
 const { Auth } = require('../middlewares/auth')
 
-router.post("/", controllers.auth.login)
+router.post("/login", controllers.auth.login)
 
 router.patch("/resendOtp", controllers.auth.resendLink)
 

@@ -2,6 +2,11 @@
 const {
   Model
 } = require('sequelize');
+const jwt = require('jsonwebtoken');
+
+require('dotenv').config();
+const jwtSecret = process.env.JWT_SECRET
+const expiry = process.env.expireIn
 module.exports = (sequelize, DataTypes) => {
   class Users extends Model {
     /**
@@ -9,16 +14,28 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({Otps, PasswordRetrive, Questions}) {
-     // define association here 
-     this.hasOne(Otps, {foreignKey: 'userId', as:'otp'});
-     this.hasOne(PasswordRetrive, {foreignKey: 'userId', as: 'passwordRetrive'});
-     this.belongsTo(Questions, { foreignKey: 'questionId', as: 'questions'});
+    static associate({ Otps, PasswordRetrive, Questions }) {
+      // define association here 
+      this.hasOne(Otps, { foreignKey: 'userId', as: 'otp' });
+      this.hasOne(PasswordRetrive, { foreignKey: 'userId', as: 'passwordRetrive' });
+      this.belongsTo(Questions, { foreignKey: 'questionId', as: 'questions' });
     }
 
-    toJSON(){
+    static generateAuthToken() {
+      const token = jwt.sign({
+        uuid: this.uuid,
+        email: this.email, 
+        status: this.status
+      },
+        jwtSecret,
+        { expiresIn: expiry })
+
+      return token;
+    }
+
+    toJSON() {
       //to hide the id
-      return {...this.get(), id: undefined}
+      return { ...this.get(), id: undefined }
     }
   };
   Users.init({
@@ -42,19 +59,19 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
-    email:{
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate:{
-        notNull: {msg: 'User must have a email'},
-        notEmpty: {msg: 'email must not be empty'}
+      validate: {
+        notNull: { msg: 'User must have a email' },
+        notEmpty: { msg: 'email must not be empty' }
       }
     },
-    questionId:{
+    questionId: {
       type: DataTypes.INTEGER,
       defaultValue: null,
     },
-    status:{
+    status: {
       type: DataTypes.ENUM('active', 'inactive', 'suspended'),
       defaultValue: 'inactive'
     }

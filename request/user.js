@@ -1,11 +1,21 @@
 const Joi = require('joi');
+const passwordComplexity = require("joi-password-complexity");
 
+const complexityOption = {
+    min:6,
+    max:20,
+    lowerCase:1,
+    upperCase: 1,
+    numeric: 1,
+    symbol: 1,
+    requirementCount: 2,
+}
 
 function validateUser(body){
     const questionSchema = Joi.object({
         surname: Joi.string().required(),
         othernames: Joi.string().required(),
-        password: Joi.string().required(),
+        password: passwordComplexity(complexityOption).required(),
         email: Joi.string().required(),
         questionId: Joi.number().required(),
     })
@@ -24,7 +34,8 @@ function validateResendLink(body){
 function validateLogin(user){
     const schema = Joi.object({
         email: Joi.string().required(),
-        password: passwordComplexity(complexityOption).required(),
+        password:Joi.string().required(),
+        // password: passwordComplexity(complexityOption).required(),
     })
 
     return schema.validate(user)
