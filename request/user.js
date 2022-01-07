@@ -6,7 +6,8 @@ function validateUser(body){
         surname: Joi.string().required(),
         othernames: Joi.string().required(),
         password: Joi.string().required(),
-        email: Joi.string().required()
+        email: Joi.string().required(),
+        questionId: Joi.number().required(),
     })
 
     return questionSchema.validate(body)
@@ -49,10 +50,22 @@ function validateResetPassword(body){
     return schema.validate(body)
 }
 
+
+function validateVerifyUser(body){
+    const schema = Joi.object({
+        email: Joi.string().required(),
+        OTPCode: Joi.string().min(4).max(4).required(),
+    })
+
+    return schema.validate(body)
+}
+
+
 module.exports = {
     validateUser,
     validateResendLink,
     validateLogin,
     validatePasswordChange,
-    validateResetPassword
+    validateResetPassword,
+    validateVerifyUser
 }

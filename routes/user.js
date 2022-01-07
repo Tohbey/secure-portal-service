@@ -1,14 +1,15 @@
 const router = require('express').Router();
-const controller = require("../controllers");
+const controllers = require("../controllers");
 const { Auth } = require('../middlewares/auth')
 
-router.get('/', Auth, controller.user.getUsers)
+router.get('/', controllers.user.getUsers) //working
 
-router.get('/:userUUID', Auth, controller.user.getUser)
+router.get('/:userUUID', controllers.user.getUser) //working
 
-router.post('/', controller.user.create)
+router.patch('/:userUUID', controllers.user.updateUser)
 
-router.patch('/terminate/:userUUID', Auth, controller.user.terminateUser)
+router.post('/', controllers.user.create) //working
 
+router.patch('/terminate/:userUUID', Auth, controllers.user.terminateUser)
 
-module.exports = router;
+module.exports = router

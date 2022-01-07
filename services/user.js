@@ -23,12 +23,12 @@ class UserService {
                 const otpObject = {
                     token: token,
                     expiresAt: expiredDate,
-                    userId: 4,
+                    userId: createUser.id,
                 }
                 console.log(otpObject)
                 const createOTP = await Otps.create(otpObject)
 
-                resolve(createUser, createOTP);
+                resolve({createUser, createOTP});
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
@@ -54,7 +54,11 @@ class UserService {
             try {
                 const user = await Users.findOne({
                     where: filter,
-                    include: 'otp'
+                    include: [
+                        'otp',
+                        'passwordRetrive',
+                        'questions'
+                    ]
                 });
 
                 if(!user){
