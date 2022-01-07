@@ -23,7 +23,7 @@ class QuestionService {
         })
     }
 
-    static getAll() {
+    static getQuestions() {
         return new Promise(async (resolve, reject) => {
             try {
                 const questions = await Questions.findAll();
