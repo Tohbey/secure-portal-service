@@ -1,7 +1,8 @@
-const { Users, Otp, PasswordRetrive } = require('../models');
+const { Users, Otps, PasswordRetrive } = require('../models');
 const bcrypt = require('bcrypt');
 const { mailSender, GenerateOTP, GenerateCode } = require('../utils/index');
-
+const UserService = require('./user');
+const { MSG_TYPES } = require('../constant/types');
 
 class AuthService {
 
@@ -173,6 +174,36 @@ class AuthService {
                 // await user.save();
 
                 resolve({user})
+            } catch (error) {
+                reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
+            }
+        })
+    }
+
+    static verify(body) {
+        return new Promise(async (resolve, reject) => {
+            try { 
+                const filter = {
+                    email: body.email
+                }
+
+                const user = await UserService.getUser(filter)
+                if(user.otp.token != body.OTPCode){
+                    return reject({ statusCode: 404, msg: MSG_TYPES.NOT_FOUND })
+                }
+
+                const otp = await Otps.findOne({
+                    where: {
+                        uuid: user.otp.uuid
+                    }
+                })
+                user.status = 'active';
+                user.isVerified = true;
+
+                await otp.destroy();
+                await user.save();
+
+                resolve(user)
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }

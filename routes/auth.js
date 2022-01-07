@@ -12,6 +12,8 @@ router.post('/recover', controllers.auth.recover);
 
 router.get('/forgot/:email/:token', controllers.auth.reset);
 
-router.post('/reset-password', controllers.auth.resetPassword)
+router.post('/reset-password', controllers.auth.resetPassword);
+
+router.patch('/verify', controllers.auth.verify); //working
 
 module.exports = router

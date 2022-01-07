@@ -1,8 +1,7 @@
 const AuthService = require('../services/auth');
 const { MSG_TYPES } = require('../constant/types');
-const { validateLogin, validateResendLink, validateResetPassword, validatePasswordChange } = require('../request/user');
+const { validateLogin, validateResendLink, validateResetPassword, validatePasswordChange, validateVerifyUser } = require('../request/user');
 const { JsonResponse } = require('../lib/apiResponse');
-const UserService = require('../services/user');
 const bcrypt = require('bcrypt');
 
 
@@ -83,6 +82,21 @@ exports.resetPassword = async (req, res, next) => {
 
         JsonResponse(res, 200, MSG_TYPES.UPDATED, user)
     } catch (error) {
+        JsonResponse(res, error.statusCode, error.msg)
+        next(error)
+    }
+}
+
+exports.verify = async (req, res, next) => {
+    try {
+        const { error } = validateVerifyUser(req.body)
+        if (error) return JsonResponse(res, 400, error.details[0].message)
+
+        const user = await AuthService.verify(req.body)
+
+        JsonResponse(res, 200, MSG_TYPES.ACCOUNT_VERIFIED, user)
+    } catch (error) {
+        console.log({error})
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
     }
