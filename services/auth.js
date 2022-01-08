@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const { mailSender, GenerateOTP, GenerateCode } = require('../utils/index');
 const UserService = require('./user');
 const { MSG_TYPES } = require('../constant/types');
+const jwt = require('jsonwebtoken');
+
 
 class AuthService {
 
@@ -24,7 +26,69 @@ class AuthService {
                     return reject({ statusCode: 404, msg: MSG_TYPES.INVALID_PASSWORD })
                 }
 
-                const token = user.generateAuthToken()
+                const otpCode = GenerateOTP(4);
+                const expiredDate = moment().add(20, "minutes");
+
+                const otpObject = {
+                    token: otpCode,
+                    expiresAt: expiredDate,
+                    userId: user.id,
+                }
+                const createOTP = await Otps.create(otpObject)
+                const token = this.generateAuthToken(user, false);
+
+                resolve({ user, createOTP, token })
+            } catch (error) {
+                reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
+            }
+        })
+    }
+
+    static generateAuthToken(user, secondLevel) {
+        const token = jwt.sign({
+            uuid: user.uuid,
+            email: user.email,
+            role: user.role,
+            secondLevel: secondLevel
+        },
+            jwtSecret,
+            { expiresIn: '24h' })
+
+        return token;
+    }
+
+    static secondLevelAuthentication(body, user) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const currentUser = await Users.findOne({
+                    where: { 
+                        email: user.email,
+                        uuid: user.uuid, 
+                        role: user.role
+                    }
+                });
+                if (!currentUser) {
+                    return reject({ statusCode: 404, msg: MSG_TYPES.ACCOUNT_INVALID })
+                }
+
+                const validAnswer = await bcrypt.compare(body.secretAnswer, currentUser.secretAnswer)
+                if (!validAnswer) {
+                    return reject({ statusCode: 404, msg: MSG_TYPES.INVALID_ANSWER })
+                }
+
+                const otp = await Otps.findOne({
+                    where: {
+                        userId: currentUser.id,
+                        token: body.OTPCode
+                    }
+                });
+                if (!otp) {
+                    return reject({ statusCode: 404, msg: MSG_TYPES.NOT_FOUND })
+                }
+
+                const token = this.generateAuthToken(user, true);
+                await otp.destroy();
+
                 resolve({ user, token })
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
@@ -57,7 +121,11 @@ class AuthService {
                 const salt = await bcrypt.genSalt(saltNumber);
                 const updatedPassword = await bcrypt.hash(body.newPassword, salt);
 
-                resolve()
+                currentUser.password = updatedPassword;
+
+                await currentUser.save();
+
+                resolve(currentUser);
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
@@ -84,13 +152,13 @@ class AuthService {
 
                 const newToken = {
                     token: token,
+                    userId: user.id,
                     expiredDate: expiredDate
                 }
 
-                const otp = await Otp.create(newToken)
+                const otp = await Otps.create(newToken)
 
-
-                resolve({user, otp})
+                resolve({ user, otp })
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
@@ -118,7 +186,6 @@ class AuthService {
                     expiresAt: expiredDate,
                     user: user.id
                 })
-                
 
                 resolve({ user, passwordRetrive })
             } catch (error) {
@@ -136,8 +203,8 @@ class AuthService {
                         email: email
                     }
                 })
-                if(!user){
-                    return reject({statusCode:401, msg: MSG_TYPES.NOT_FOUND})
+                if (!user) {
+                    return reject({ statusCode: 401, msg: MSG_TYPES.NOT_FOUND })
                 }
 
                 const passwordRetrive = await PasswordRetrive.findOne({
@@ -146,11 +213,11 @@ class AuthService {
                         userId: user.id
                     }
                 })
-                if(!passwordRetrive){
-                    return reject({statusCode:401, msg: MSG_TYPES.NOT_FOUND})
+                if (!passwordRetrive) {
+                    return reject({ statusCode: 401, msg: MSG_TYPES.NOT_FOUND })
                 }
 
-                resolve({msg: 'Redirect to forgot password'})
+                resolve({ msg: 'Redirect to forgot password' })
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
@@ -164,17 +231,17 @@ class AuthService {
                     where: {
                         email: body.email
                     },
-                    include:'passwordRetrive'
+                    include: 'passwordRetrive'
                 })
 
-                if(!user){
-                    return reject({statusCode:401, msg: MSG_TYPES.NOT_FOUND})
+                if (!user) {
+                    return reject({ statusCode: 401, msg: MSG_TYPES.NOT_FOUND })
                 }
-                // user.password = body.password;
+                user.password = body.password;
 
-                // await user.save();
+                await user.save();
 
-                resolve({user})
+                resolve({ user })
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
@@ -183,13 +250,13 @@ class AuthService {
 
     static verify(body) {
         return new Promise(async (resolve, reject) => {
-            try { 
+            try {
                 const filter = {
                     email: body.email
                 }
 
                 const user = await UserService.getUser(filter)
-                if(user.otp.token != body.OTPCode){
+                if (user.otp.token != body.OTPCode) {
                     return reject({ statusCode: 404, msg: MSG_TYPES.NOT_FOUND })
                 }
 
