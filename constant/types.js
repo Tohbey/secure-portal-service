@@ -22,6 +22,7 @@ const MSG_TYPES = Object.freeze({
     PERMISSION: "You don't have enough permission to perform this action",
     SERVER_ERROR: "Server Error!",
     INVALID_PASSWORD: "Invalid Password",
+    INVALID_ANSWER: "Invalid Answer",
     SENT: "Email Sent",
     DOCUMENT_REQUIRED:"Documents/images are required"
 });
