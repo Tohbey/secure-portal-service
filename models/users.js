@@ -2,11 +2,6 @@
 const {
   Model
 } = require('sequelize');
-const jwt = require('jsonwebtoken');
-
-require('dotenv').config();
-const jwtSecret = process.env.JWT_SECRET
-const expiry = process.env.expireIn
 module.exports = (sequelize, DataTypes) => {
   class Users extends Model {
     /**
@@ -19,18 +14,6 @@ module.exports = (sequelize, DataTypes) => {
       this.hasOne(Otps, { foreignKey: 'userId', as: 'otp' });
       this.hasOne(PasswordRetrive, { foreignKey: 'userId', as: 'passwordRetrive' });
       this.belongsTo(Questions, { foreignKey: 'questionId', as: 'questions' });
-    }
-
-    static generateAuthToken() {
-      const token = jwt.sign({
-        uuid: this.uuid,
-        email: this.email, 
-        status: this.status
-      },
-        jwtSecret,
-        { expiresIn: expiry })
-
-      return token;
     }
 
     toJSON() {
@@ -71,9 +54,17 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       defaultValue: null,
     },
+    secretAnswer:{
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM('active', 'inactive', 'suspended'),
       defaultValue: 'inactive'
+    },
+    role:{
+      type: DataTypes.ENUM('admin', 'user'),
+      defaultValue: 'user'
     }
   }, {
     sequelize,

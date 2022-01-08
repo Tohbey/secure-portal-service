@@ -18,6 +18,8 @@ function validateUser(body){
         password: passwordComplexity(complexityOption).required(),
         email: Joi.string().required(),
         questionId: Joi.number().required(),
+        secretAnswer: Joi.string().required(),
+        role: Joi.string().required(),
     })
 
     return questionSchema.validate(body)
@@ -34,8 +36,7 @@ function validateResendLink(body){
 function validateLogin(user){
     const schema = Joi.object({
         email: Joi.string().required(),
-        password:Joi.string().required(),
-        // password: passwordComplexity(complexityOption).required(),
+        password: passwordComplexity(complexityOption).required()
     })
 
     return schema.validate(user)
@@ -71,6 +72,16 @@ function validateVerifyUser(body){
     return schema.validate(body)
 }
 
+function validateSecondAuth(body){
+    const schema = Joi.object({
+        OTPCode: Joi.string().min(0).max(4).required(),
+        secretAnswer: Joi.string().required()
+    })
+
+    return schema.validate(body)
+}
+
+
 
 module.exports = {
     validateUser,
@@ -78,5 +89,6 @@ module.exports = {
     validateLogin,
     validatePasswordChange,
     validateResetPassword,
-    validateVerifyUser
+    validateVerifyUser,
+    validateSecondAuth
 }

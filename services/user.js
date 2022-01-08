@@ -25,7 +25,6 @@ class UserService {
                     expiresAt: expiredDate,
                     userId: createUser.id,
                 }
-                console.log(otpObject)
                 const createOTP = await Otps.create(otpObject)
 
                 resolve({createUser, createOTP});

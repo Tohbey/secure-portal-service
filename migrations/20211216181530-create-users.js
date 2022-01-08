@@ -41,6 +41,14 @@ module.exports = {
         allowNull: false,
         defaultValue: 'inactive'
       },
+      role:{
+        type: DataTypes.ENUM('admin', 'user'),
+        defaultValue: 'user'
+      },
+      secretAnswer:{
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       questionId:{
         type: DataTypes.INTEGER,
         defaultValue: null,
