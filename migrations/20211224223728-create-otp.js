@@ -9,7 +9,7 @@ module.exports = {
         type: DataTypes.INTEGER
       },
       token:{
-        type:  DataTypes.STRING,
+        type:  DataTypes.INTEGER,
         allowNull: false,
       },
       uuid: {

@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   Otp.init({
     token:{
-      type:  DataTypes.STRING,
+      type:  DataTypes.INTEGER,
       allowNull: false,
     },
     uuid: {
