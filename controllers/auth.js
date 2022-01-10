@@ -1,6 +1,6 @@
 const AuthService = require('../services/auth');
 const { MSG_TYPES } = require('../constant/types');
-const { validateLogin, validateResendLink, validateResetPassword, validatePasswordChange, validateVerifyUser, validateSecondAuth } = require('../request/user');
+const { validateLogin, validateResendOTP, validateResetPassword, validatePasswordChange, validateVerifyUser, validateSecondAuth } = require('../request/user');
 const { JsonResponse } = require('../lib/apiResponse');
 const bcrypt = require('bcrypt');
 
@@ -11,9 +11,13 @@ exports.login = async (req, res, next) => {
         if (error) return JsonResponse(res, 400, error.details[0].message);
 
         let { user, createOTP, token } = await AuthService.login(req.body)
+        let meta = {
+            createOTP,
+            token
+        }
         res.header('x-auth-token', token)
 
-        JsonResponse(res, 200, MSG_TYPES.LOGGED_IN, user, createOTP)
+        JsonResponse(res, 200, MSG_TYPES.LOGGED_IN, user, meta)
     } catch (error) {
         console.log({ error })
         JsonResponse(res, error.statusCode, error.msg)
@@ -26,10 +30,10 @@ exports.secondLevelAuthentication = async (req, res, next) => {
         const { error } = validateSecondAuth(req.body)
         if (error) return JsonResponse(res, 400, error.details[0].message);
 
-        let { user, token } = await AuthService.secondLevelAuthentication(req.body, req.user)
+        let { currentUser, token } = await AuthService.secondLevelAuthentication(req.body, req.user)
         res.header('x-auth-token', token)
 
-        JsonResponse(res, 200, MSG_TYPES.LOGGED_IN, user, createOTP)
+        JsonResponse(res, 200, MSG_TYPES.LOGGED_IN, currentUser, token)
     } catch (error) {
         console.log({ error })
         JsonResponse(res, error.statusCode, error.msg)
@@ -38,14 +42,15 @@ exports.secondLevelAuthentication = async (req, res, next) => {
 }
 
 
-exports.resendLink = async (req, res, next) => {
+exports.resendOTP = async (req, res, next) => {
     try {
-        const { error } = validateResendLink(req.body);
+        const { error } = validateResendOTP(req.body);
         if (error) return JsonResponse(res, 400, error.details[0].message);
 
-        const { user, otp } = await AuthService.resendLink(req.body.email, req)
+        const { user, otp } = await AuthService.resendOTP(req.body.email, req)
         JsonResponse(res, 200, MSG_TYPES.UPDATED, user, otp)
     } catch (error) {
+        console.log({ error })
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
     }
@@ -55,10 +60,11 @@ exports.passwordChange = async (req, res, next) => {
     try {
         const { error } = validatePasswordChange(req.body);
         if (error) return JsonResponse(res, 400, error.details[0].message);
-
-        const { user } = await AuthService.updatedPassword(req.user, req.body);
+        
+        const { user } = await AuthService.updatePassword(req.user, req.body);
         JsonResponse(res, 200, MSG_TYPES.UPDATED, user);
     } catch (error) {
+        console.log({error})
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
     }
@@ -66,9 +72,12 @@ exports.passwordChange = async (req, res, next) => {
 
 exports.recover = async (req, res, next) => {
     try {
+        const { error } = validateResendOTP(req.body);
+        if (error) return JsonResponse(res, 400, error.details[0].message);
+
         const user = await AuthService.recover(req.body, req);
 
-        return JsonResponse(res, 200, MSG_TYPES.SENT, user)
+        JsonResponse(res, 200, MSG_TYPES.SENT, user)
     } catch (error) {
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
@@ -82,7 +91,8 @@ exports.reset = async (req, res, next) => {
 
         const msg = await AuthService.reset(email, token);
 
-        res.redirect('http://localhost:4200/forgot-password/' + token + "/" + email);
+        JsonResponse(res, 200, msg);
+        // res.redirect('http://localhost:4200/forgot-password/' + token + "/" + email);
     } catch (error) {
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
@@ -101,6 +111,7 @@ exports.resetPassword = async (req, res, next) => {
 
         JsonResponse(res, 200, MSG_TYPES.UPDATED, user)
     } catch (error) {
+        console.log({error})
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
     }

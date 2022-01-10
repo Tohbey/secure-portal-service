@@ -1,19 +1,22 @@
+//working
 const router = require("express").Router();
 const controllers = require("../controllers");
 const { Auth } = require('../middlewares/auth')
 
-router.post("/login", controllers.auth.login)
+router.post("/login", controllers.auth.login); 
 
-router.patch("/resendOtp", controllers.auth.resendLink)
+router.post("/second-auth", Auth ,controllers.auth.secondLevelAuthentication); 
 
-router.patch("/change-password", Auth, controllers.auth.passwordChange)
+router.patch("/resendOtp", controllers.auth.resendOTP); 
 
-router.post('/recover', controllers.auth.recover);
+router.patch("/change-password", Auth, controllers.auth.passwordChange); 
 
-router.get('/forgot/:email/:token', controllers.auth.reset);
+router.post('/recover', controllers.auth.recover); 
+
+router.get('/forgot/:email/:token', controllers.auth.reset); 
 
 router.post('/reset-password', controllers.auth.resetPassword);
 
-router.patch('/verify', controllers.auth.verify); //working
+router.patch('/verify', controllers.auth.verify); 
 
 module.exports = router

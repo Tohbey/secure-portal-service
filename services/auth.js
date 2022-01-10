@@ -4,6 +4,9 @@ const { mailSender, GenerateOTP, GenerateCode } = require('../utils/index');
 const UserService = require('./user');
 const { MSG_TYPES } = require('../constant/types');
 const jwt = require('jsonwebtoken');
+const moment = require("moment");
+require('dotenv').config();
+const jwtSecret = process.env.JWT_SECRET;
 
 
 class AuthService {
@@ -61,9 +64,9 @@ class AuthService {
         return new Promise(async (resolve, reject) => {
             try {
                 const currentUser = await Users.findOne({
-                    where: { 
+                    where: {
                         email: user.email,
-                        uuid: user.uuid, 
+                        uuid: user.uuid,
                         role: user.role
                     }
                 });
@@ -89,7 +92,7 @@ class AuthService {
                 const token = this.generateAuthToken(user, true);
                 await otp.destroy();
 
-                resolve({ user, token })
+                resolve({ currentUser, token })
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
@@ -118,7 +121,7 @@ class AuthService {
                 if (!validPassword) {
                     return reject({ statusCode: 404, msg: MSG_TYPES.ACCOUNT_INVALID });
                 }
-                const salt = await bcrypt.genSalt(saltNumber);
+                const salt = await bcrypt.genSalt(10);
                 const updatedPassword = await bcrypt.hash(body.newPassword, salt);
 
                 currentUser.password = updatedPassword;
@@ -132,7 +135,7 @@ class AuthService {
         })
     }
 
-    static resendToken(email, req) {
+    static resendOTP(email, req) {
         return new Promise(async (resolve, reject) => {
             try {
                 const user = await Users.findOne({
@@ -143,7 +146,8 @@ class AuthService {
 
                 if (!user) {
                     return reject({ statusCode: 401, msg: MSG_TYPES.NOT_FOUND })
-                } else if (user.isVerified) {
+                }
+                else if (user.isVerified) {
                     return reject({ statusCode: 200, msg: MSG_TYPES.ACCOUNT_HASVERIFIED })
                 }
 
@@ -153,7 +157,7 @@ class AuthService {
                 const newToken = {
                     token: token,
                     userId: user.id,
-                    expiredDate: expiredDate
+                    expiresAt: expiredDate
                 }
 
                 const otp = await Otps.create(newToken)
@@ -184,7 +188,7 @@ class AuthService {
                 const passwordRetrive = await PasswordRetrive.create({
                     passwordRetrivetoken: token,
                     expiresAt: expiredDate,
-                    user: user.id
+                    userId: user.id
                 })
 
                 resolve({ user, passwordRetrive })
@@ -197,6 +201,7 @@ class AuthService {
     static reset(email, token) {
         return new Promise(async (resolve, reject) => {
             try {
+                console.log(email, token)
                 const currentDate = new Date();
                 const user = await Users.findOne({
                     where: {
@@ -216,8 +221,9 @@ class AuthService {
                 if (!passwordRetrive) {
                     return reject({ statusCode: 401, msg: MSG_TYPES.NOT_FOUND })
                 }
+                let msg = 'Redirect to forgot password page';
 
-                resolve({ msg: 'Redirect to forgot password' })
+                resolve(msg)
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
@@ -238,6 +244,17 @@ class AuthService {
                     return reject({ statusCode: 401, msg: MSG_TYPES.NOT_FOUND })
                 }
                 user.password = body.password;
+                const passwordRetrive = await PasswordRetrive.findOne({
+                    where: {
+                        passwordRetrivetoken: body.token,
+                        userId: user.id
+                    }
+                })
+                if (!passwordRetrive) {
+                    return reject({ statusCode: 401, msg: MSG_TYPES.NOT_FOUND })
+                }
+
+                await passwordRetrive.destroy();
 
                 await user.save();
 
