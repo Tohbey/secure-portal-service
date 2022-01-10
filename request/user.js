@@ -19,13 +19,13 @@ function validateUser(body){
         email: Joi.string().required(),
         questionId: Joi.number().required(),
         secretAnswer: Joi.string().required(),
-        role: Joi.string().required(),
+        role: Joi.string().valid('admin','user').required(),
     })
 
     return questionSchema.validate(body)
 }
 
-function validateResendLink(body){
+function validateResendOTP(body){
     const schema = Joi.object({
         email: Joi.string().max(50).required(),
     })
@@ -85,7 +85,7 @@ function validateSecondAuth(body){
 
 module.exports = {
     validateUser,
-    validateResendLink,
+    validateResendOTP,
     validateLogin,
     validatePasswordChange,
     validateResetPassword,
