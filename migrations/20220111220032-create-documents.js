@@ -24,13 +24,17 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      userId: {
+      owner: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
       shared: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        defaultValue: 0
       },
       location: {
         type: DataTypes.STRING,

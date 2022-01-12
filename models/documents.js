@@ -9,8 +9,9 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate({Users}) {
       // define association here
+      this.belongsTo(Users, {foreignKey: 'owner', as: 'users'})
     }
 
     toJSON() {
@@ -27,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     size: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -35,13 +40,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    userId: {
+    owner: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
     shared: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      defaultValue: 0
     },
     location: {
       type: DataTypes.STRING,
