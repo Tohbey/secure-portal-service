@@ -2,16 +2,19 @@ const router = require('express').Router();
 const controllers = require("../controllers");
 const { Auth } = require('../middlewares/auth')
 
-router.get('/', controllers.document.getDocuments);
+router.get('/', Auth, controllers.document.getDocuments);
 
-router.get('/user', controllers.document.getDocumentsByUser);
+router.get('/user', Auth, controllers.document.getDocumentsByUser);
 
-router.get('/:documentUUID', controllers.document.getDocument);
+router.get('/:documentUUID', Auth, controllers.document.getDocument);
 
-router.patch('/:documentUUID', controllers.document.updateDocument);
+router.patch('/:documentUUID', Auth, controllers.document.updateDocument);
 
-router.post('/', controllers.document.create);
+router.delete('/:documentUUID', Auth, controllers.document.deleteDocument);
 
+router.post('/', Auth, controllers.document.create);
+
+//not working yet
 router.post('/share/:documentUUID', Auth, controllers.document.shareDocument);
 
 module.exports = router

@@ -1,4 +1,4 @@
-const { Documents } = require('../models');
+const { Document } = require('../models');
 const { mailSender } = require('../utils/index');
 const { MSG_TYPES } = require('../constant/types');
 const UserService = require('./user')
@@ -15,19 +15,19 @@ class DocumentService {
 
                 body.owner = currntUser.id
 
-                const document = await Documents.findOne({
+                const document = await Document.findOne({
                     where: {
-                        name: body.name, 
+                        name: body.name,
                         owner: body.owner
                     }
                 });
 
-                if(document) {
+                if (document) {
                     return reject({ statusCode: 404, msg: MSG_TYPES.EXIST })
                 }
 
-                const createDocument = await Documents.create(body);
-                
+                const createDocument = await Document.create(body);
+
                 resolve(createDocument);
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
@@ -38,12 +38,12 @@ class DocumentService {
     static getDocument(filter) {
         return new Promise(async (resolve, reject) => {
             try {
-                const document = await Documents.findOne({
-                    where: filter, 
+                const document = await Document.findOne({
+                    where: filter,
                     include: 'user'
                 });
 
-                if(!document) {
+                if (!document) {
                     return reject({ statusCode: 404, msg: MSG_TYPES.NOT_FOUND })
                 }
 
@@ -52,12 +52,12 @@ class DocumentService {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
         })
-    } 
+    }
 
     static getDocuments(filter = {}) {
         return new Promise(async (resolve, reject) => {
             try {
-                if(filter.owner){
+                if (filter.owner) {
                     let filterUser = {
                         uuid: filter.owner
                     }
@@ -66,34 +66,42 @@ class DocumentService {
                     filter.owner = currntUser.id;
                 }
 
-                const documents = await Documents.findAll({
+                const documents = await Document.findAll({
                     where: filter
                 });
 
                 const total = documents.length;
 
-                resolve({documents, total});
+                resolve({ documents, total });
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
         })
-    } 
+    }
 
     static deleteDocument(filter) {
         return new Promise(async (resolve, reject) => {
             try {
-                const document = await Documents.findOne({
+
+                let filterUser = {
+                    uuid: filter.owner
+                }
+                const currntUser = await UserService.getUser(filterUser);
+
+                filter.owner = currntUser.id;
+
+                const document = await Document.findOne({
                     where: filter
                 })
 
                 await document.destroy();
 
-                resolve({msg: MSG_TYPES.DELETED});
+                resolve({ msg: MSG_TYPES.DELETED });
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
         })
-    } 
+    }
 
     static updateDocument(filter) {
         return new Promise(async (resolve, reject) => {
@@ -103,7 +111,7 @@ class DocumentService {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
         })
-    } 
+    }
 
     static shareDocument(body) {
         return new Promise(async (resolve, reject) => {
@@ -113,7 +121,7 @@ class DocumentService {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
         })
-    } 
+    }
 }
 
 module.exports = DocumentService;

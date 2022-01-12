@@ -16,20 +16,18 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      description: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       size: {
         type: DataTypes.INTEGER,
-        allowNull: false,
       },
       type: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       owner: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      description: {
-        type: DataTypes.STRING,
         allowNull: false,
       },
       shared: {
@@ -38,7 +36,6 @@ module.exports = {
       },
       location: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       createdAt: {
         allowNull: false,
