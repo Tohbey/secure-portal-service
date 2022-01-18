@@ -13,10 +13,10 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
 
-    toJSON(){
-      //to hide the id
-      return {...this.get(), id: undefined}
-    }
+    // toJSON(){
+    //   //to hide the id
+    //   return {...this.get(), id: undefined}
+    // }
   };
   Question.init({
     uuid: {

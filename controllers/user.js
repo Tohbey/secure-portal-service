@@ -24,6 +24,20 @@ exports.create = async (req, res, next) => {
     }
 }
 
+exports.getCurrentUser = async (req, res, next) => {
+    try {
+        let filter = {
+            uuid: req.user.uuid
+        };
+
+        let user = await UserService.getUser(filter);
+
+        JsonResponse(res, 200, MSG_TYPES.FETCHED, user);
+    } catch (error) {
+        next(error)
+        JsonResponse(res, error.statusCode, error.msg)
+    }
+}
 
 exports.getUser = async (req, res, next) => {
     try {
