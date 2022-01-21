@@ -19,7 +19,7 @@ function validateUser(body){
         email: Joi.string().required(),
         questionId: Joi.number().required(),
         secretAnswer: Joi.string().required(),
-        role: Joi.string().valid('admin','user').required(),
+        role: Joi.string().valid('admin','user').optional(),
     })
 
     return questionSchema.validate(body)
