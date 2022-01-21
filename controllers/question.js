@@ -21,7 +21,7 @@ exports.create = async (req, res, next) => {
 exports.getQuestion = async (req, res, next) => {
     try {
         let filter = {
-            uuid: req.params.questionUUID
+            id: req.params.questionId
         };
 
         let question = await QuestionService.getQuestion(filter);

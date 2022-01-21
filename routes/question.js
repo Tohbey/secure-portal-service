@@ -2,7 +2,7 @@
 const router = require('express').Router();
 const controller = require("../controllers");
 
-router.get('/:questionUUID', controller.question.getQuestion);
+router.get('/:questionId', controller.question.getQuestion);
 
 router.get('/', controller.question.getQuestions);
 
