@@ -60,11 +60,11 @@ exports.passwordChange = async (req, res, next) => {
     try {
         const { error } = validatePasswordChange(req.body);
         if (error) return JsonResponse(res, 400, error.details[0].message);
-        
+
         const { user } = await AuthService.updatePassword(req.user, req.body);
         JsonResponse(res, 200, MSG_TYPES.UPDATED, user);
     } catch (error) {
-        console.log({error})
+        console.log({ error })
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
     }
@@ -75,9 +75,9 @@ exports.recover = async (req, res, next) => {
         const { error } = validateResendOTP(req.body);
         if (error) return JsonResponse(res, 400, error.details[0].message);
 
-        const user = await AuthService.recover(req.body, req);
+        const { user, passwordRetrive } = await AuthService.recover(req.body);
 
-        JsonResponse(res, 200, MSG_TYPES.SENT, user)
+        JsonResponse(res, 200, MSG_TYPES.SENT, user, passwordRetrive)
     } catch (error) {
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
@@ -92,7 +92,7 @@ exports.reset = async (req, res, next) => {
         const msg = await AuthService.reset(email, token);
 
         JsonResponse(res, 200, msg);
-        // res.redirect('http://localhost:4200/forgot-password/' + token + "/" + email);
+        res.redirect('http://localhost:3000/forgot-password/' + email + "/" + token);
     } catch (error) {
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
@@ -111,7 +111,7 @@ exports.resetPassword = async (req, res, next) => {
 
         JsonResponse(res, 200, MSG_TYPES.UPDATED, user)
     } catch (error) {
-        console.log({error})
+        console.log({ error })
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
     }
