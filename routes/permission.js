@@ -12,3 +12,4 @@ router.post('/', Auth, controllers.permission.create);
 
 router.delete('/:permissionUUID', Auth, controllers.permission.deletePermission);
 
+module.exports = router

@@ -4,6 +4,7 @@ const question = require('../routes/question');
 const user = require('../routes/user');
 const document = require('../routes/document');
 const auth = require('../routes/auth');
+const permission = require('../routes/permission');
 
 module.exports = function(app){
     app.use(express.json({extended: true}));
@@ -12,6 +13,7 @@ module.exports = function(app){
     app.use('/api/v1/question', question);
     app.use('/api/v1/user', user);
     app.use('/api/v1/document', document);
+    app.use('/api/v1/permission', permission);
 
     app.use((req, res, next) => {
         return JsonResponse(res, 404, "API endpoint not found")
