@@ -65,7 +65,6 @@ class QuestionService {
                 await question.destroy();
 
                 resolve({msg: MSG_TYPES.DELETED})
-
             } catch (error) {
                 reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error })
             }
