@@ -67,7 +67,7 @@ exports.getPermissions = async (req, res, next) => {
 exports.deletePermission = async (req, res, next) => {
     try {
         let filter = {
-            uuid: req.params.documentUUID
+            uuid: req.params.permissionUUID
         }
 
         await PermissionService.deletePermissions(filter);
