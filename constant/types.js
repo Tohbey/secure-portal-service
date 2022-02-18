@@ -24,7 +24,9 @@ const MSG_TYPES = Object.freeze({
     INVALID_PASSWORD: "Invalid Password",
     INVALID_ANSWER: "Invalid Answer",
     SENT: "Email Sent",
-    DOCUMENT_REQUIRED:"Documents/images are required"
+    DOCUMENT_REQUIRED:"Documents/images are required",
+    DOCUMENT_HAS_BEEN_SHARED: 'Document has been shared ot this user',
+    EXCEED_SHARED_MAX: 'Document has exceeded the maximum amount of shared.'
 });
   
   
