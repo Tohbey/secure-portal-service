@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
@@ -33,7 +34,7 @@
     "node-mailjet": "^3.3.4",
     "nodemon": "^2.0.15",
     "randexp": "^0.5.3",
-    "sequelize": "^6.12.0-beta.3",
+    "sequelize": "^6.16.1",
     "winston": "^3.3.3"
   }
 }
