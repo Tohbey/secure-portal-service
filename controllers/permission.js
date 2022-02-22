@@ -13,32 +13,16 @@ exports.create = async (req, res, next) => {
 
         JsonResponse(res, 201, MSG_TYPES.CREATED, createPermissions);
     } catch (error) {
+        console.log(error);
         next(error)
         JsonResponse(res, error.statusCode, error.msg)
     }
 }
 
-
-exports.getPermissionByUUID = async (req, res, next) => {
+exports.getPermission = async (req, res, next) => {
     try {
         let filter = {
-            uuid: req.params.permissionUUID
-        };
-
-        let permission = await PermissionService.getPermission(filter)
-
-        JsonResponse(res, 200, MSG_TYPES.FETCHED, permission)
-    } catch (error) {
-        next(error)
-        JsonResponse(res, error.statusCode, error.msg)
-    }
-}
-
-
-exports.getPermissionById = async (req, res, next) => {
-    try {
-        let filter = {
-            uuid: req.params.permissionId
+            id: req.params.permissionId
         };
 
         let permission = await PermissionService.getPermission(filter)

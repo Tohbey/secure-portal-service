@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
 
     toJSON() {
       //to hide the id
-      return { ...this.get(), id: undefined }
+      // return { ...this.get(), id: undefined }
     }
   };
   Permissions.init({

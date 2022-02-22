@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     // toJSON(){
-    //   //to hide the id
+      //to hide the id
     //   return {...this.get(), id: undefined}
     // }
   };

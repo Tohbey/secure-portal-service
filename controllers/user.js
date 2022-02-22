@@ -71,12 +71,14 @@ exports.terminateUser = async (req, res, next) => {
         let filter = {
             uuid: req.user.userUUID
         };
+        console.log(filter)
 
         let user = await UserService.terminateUser(filter);
 
         JsonResponse(res, 200, MSG_TYPES.SUSPENDED, user);
 
     } catch (error) {
+        console.log(error)
         next(error)
         JsonResponse(res, error.statusCode, error.msg)
     }

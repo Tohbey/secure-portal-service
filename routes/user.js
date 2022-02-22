@@ -12,6 +12,6 @@ router.patch('/:userUUID', Auth, controllers.user.updateUser)
 
 router.post('/', controllers.user.create) //working
 
-router.patch('/terminate/:userUUID', Auth, controllers.user.terminateUser)
+router.patch('/terminate', Auth, controllers.user.terminateUser)
 
 module.exports = router
